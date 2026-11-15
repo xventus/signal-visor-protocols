@@ -8,8 +8,7 @@ pulse timing, decoded symbols and protocol fields from remote controls and wirel
 
 *Signal Visor analysing a generated EV1527 demo recording. Click the screenshot to visit the application website.*
 
-**This repository contains JSON protocol definitions for Signal Visor.** The application source
-code and its capture-based test suite are maintained separately.
+**This repository contains JSON protocol definitions for Signal Visor.** It does not include the application’s source code or its capture-based test suite.
 
 Use [Protocol Studio](https://fotoventus.cz/signalvisor/protocol-editor.html) to browse definitions,
 load an existing JSON file, create or edit a definition, validate it and download the result.
