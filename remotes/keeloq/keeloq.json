@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "keeloq",
+  "name": "KeeLoq HCS remote (rolling code, identification only)",
+  "status": "draft",
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "rolling_code",
+  "description": "Microchip HCS encoder (HCS200/300/301 and clones) used in gate, garage and alarm remotes. A preamble of about twelve 1:1 pulses, a header gap of ten elements, then 66 bits sent least significant first: '1' is one element of carrier and two of silence, '0' two and one. Bits 0-31 are the encrypted hopping code, which changes on every press; bits 32-59 the serial number, 60-63 the buttons, 64 low battery and 65 repeat. Fields are numbered in the frame as this definition stores it, most significant first after the least-significant-first transmission is reversed. This definition only recognises the frame and splits it into those parts: the hopping code is shown as received and is never decrypted. The element is set by the encoder's oscillator, hence the range. Draft because the structure was confirmed on a private recording that, being a rolling code, may not be distributed.",
+  "devices": [
+    { "vendor": "various", "model": "Microchip HCS200 / HCS300 / HCS301 encoder" }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [433920000, 315000000, 868350000]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 400,
+    "te_range_us": [200, 800],
+    "tolerance": 0.3,
+    "bit_order": "lsb",
+    "symbols": {
+      "1": [1, -2],
+      "0": [2, -1]
+    },
+    "sync": {
+      "pattern": [1, -10],
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 66,
+    "repeats_min": 1
+  },
+  "fields": [
+    { "name": "repeat", "start": 0, "len": 1, "format": "bin", "role": "other" },
+    { "name": "low_battery", "start": 1, "len": 1, "format": "bin", "role": "battery" },
+    { "name": "button", "start": 2, "len": 4, "format": "bin", "role": "button" },
+    { "name": "serial", "start": 6, "len": 28, "format": "hex", "role": "id" },
+    { "name": "encrypted", "start": 34, "len": 32, "format": "hex", "role": "other" }
+  ],
+  "tests": []
+}

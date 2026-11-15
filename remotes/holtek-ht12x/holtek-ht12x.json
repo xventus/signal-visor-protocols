@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "0.1.0",
+  "license": "CC0-1.0",
+  "classification": "fixed_code",
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [
+      315000000,
+      433920000,
+      868350000,
+      915000000
+    ]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 333,
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "invert": true,
+    "symbols": {
+      "0": [
+        1,
+        -2
+      ],
+      "1": [
+        2,
+        -1
+      ]
+    },
+    "sync": {
+      "pattern": [
+        -36,
+        1
+      ],
+      "position": "before"
+    }
+  },
+  "fields": [
+    {
+      "name": "code",
+      "start": 0,
+      "len": 12,
+      "format": "uint",
+      "role": "id"
+    }
+  ],
+  "tests": [],
+  "id": "holtek-ht12x",
+  "name": "Holtek HT12X 12-bit remote",
+  "description": "Holtek HT12X-compatible fixed-code encoder: inverted PWM, 12-bit code, no checksum. Common in ceiling fan and gate remotes across the 315, 433, 868 and 915 MHz variants. Timing element is grounded in real devices, not a guess; fields and bit order are not. Retain draft status until an identified RAW/Key pair verifies those against this project's own pulse decoder, not just another decoder's reported value.",
+  "devices": [
+    {
+      "vendor": "Holtek",
+      "model": "HT12X-compatible encoder/decoder"
+    },
+    {
+      "vendor": "various",
+      "model": "CHQ8BT7053T ceiling fan remotes"
+    }
+  ],
+  "frame": {
+    "length": 12,
+    "repeats_min": 2,
+    "gap_us": 5000
+  }
+}

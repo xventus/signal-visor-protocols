@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "id": "ev1527",
+  "name": "EV1527 learning-code remote",
+  "status": "verified",
+  "version": "1.1.0",
+  "license": "CC0-1.0",
+  "classification": "fixed_code",
+  "description": "The most common cheap 433 MHz remote and PIR encoder. One timing element T, a bit is 1T mark + 3T space for zero and 3T mark + 1T space for one, and frames are separated by a 1T mark followed by a long gap. The 20-bit identifier is burnt in at the factory and the low four bits select the button. Bits are numbered as transmitted, first received bit first, which is the convention this project's Flipper and RCSwitch exports expect.",
+  "devices": [
+    { "vendor": "various", "model": "EV1527 / RT1527 / FP527 encoder" },
+    { "vendor": "SGOOWAY", "model": "PIR detector", "note": "EV1527 encoder on board" }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [433920000, 315000000]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 350,
+    "te_range_us": [150, 800],
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "symbols": {
+      "0": [1, -3],
+      "1": [3, -1]
+    },
+    "sync": {
+      "pattern": [1, -31],
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 24,
+    "repeats_min": 2,
+    "gap_us": 10850
+  },
+  "fields": [
+    { "name": "id", "start": 0, "len": 20, "format": "hex", "role": "id" },
+    { "name": "button", "start": 20, "len": 4, "format": "bin", "role": "button" }
+  ],
+  "exports": {
+    "flipper": "Princeton",
+    "esphome": "rc_switch"
+  },
+  "tests": [
+    {},
+    {},
+    {},
+    {}
+  ]
+}

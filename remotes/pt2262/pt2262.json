@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "id": "pt2262",
+  "name": "PT2262 tri-state remote",
+  "status": "verified",
+  "version": "1.1.0",
+  "license": "CC0-1.0",
+  "classification": "fixed_code",
+  "description": "Older encoder whose address and data lines each carry three states, not two: low, high and floating. One trit occupies two pulse pairs, so the alphabet here is {0,1,F} rather than bits, following the datasheet. Eight address trits are followed by four data trits. Because the alphabet is not binary, fields use the raw format and no checksum can be declared. The timing element is set by an external resistor and therefore varies between devices, so matching uses the element measured in the capture, with the nominal value acting only as a plausibility gate. A PT2262 transmission is also a valid 24-bit reading for EV1527, because 12 trits are the same 1:3 pulse stream as 24 bits; the two cannot be told apart from timing alone, so both appear as candidates and the tri-state reading is the more informative one.",
+  "devices": [
+    {
+      "vendor": "Princeton Technology",
+      "model": "PT2262"
+    },
+    {
+      "vendor": "various",
+      "model": "SC2262 / M3E encoder"
+    }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [
+      433920000,
+      315000000
+    ]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 500,
+    "te_range_us": [150, 800],
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "symbols": {
+      "0": [
+        1,
+        -3,
+        1,
+        -3
+      ],
+      "1": [
+        3,
+        -1,
+        3,
+        -1
+      ],
+      "F": [
+        1,
+        -3,
+        3,
+        -1
+      ]
+    },
+    "sync": {
+      "pattern": [
+        1,
+        -31
+      ],
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 12,
+    "repeats_min": 2
+  },
+  "fields": [
+    {
+      "name": "address",
+      "start": 0,
+      "len": 8,
+      "format": "raw",
+      "role": "id"
+    },
+    {
+      "name": "data",
+      "start": 8,
+      "len": 4,
+      "format": "raw",
+      "role": "button"
+    }
+  ],
+  "exports": {
+    "flipper": "Princeton"
+  },
+  "tests": [
+    {},
+    {},
+    {}
+  ]
+}

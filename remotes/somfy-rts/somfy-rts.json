@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "id": "somfy-rts",
+  "name": "Somfy RTS (rolling code, identification only)",
+  "status": "verified",
+  "version": "1.1.0",
+  "license": "CC0-1.0",
+  "classification": "rolling_code",
+  "description": "Blind and awning remote on the unusual frequency 433.42 MHz, Manchester coded, with a rolling counter that changes on every press. Framing is anchored to the software sync mark of about eight half-bits: Somfy prepends a wakeup pulse and several hardware sync pairs of about 2560 us, and without an anchor the codec would read those as data and misalign the 56-bit window. The sync's trailing space is matched leniently because it runs into the first half-bit of data. FIELDS CANNOT BE DECLARED YET: the payload is obfuscated by an XOR chain (each byte XOR the previous one) and the schema has no primitive for that, so this definition exposes the raw frame; a transform primitive would be needed to name control, counter and address here.",
+  "devices": [
+    {
+      "vendor": "Somfy",
+      "model": "Telis / Situo RTS",
+      "note": "433.42 MHz, not 433.92"
+    }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [
+      433420000
+    ]
+  },
+  "coding": {
+    "type": "MANCHESTER",
+    "te_us": 604,
+    "tolerance": 0.4,
+    "polarity": "ieee",
+    "bit_order": "msb",
+    "sync": {
+      "pattern": [
+        8,
+        -1
+      ],
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 56,
+    "repeats_min": 1
+  },
+  "fields": [
+    {
+      "name": "frame",
+      "start": 0,
+      "len": 56,
+      "format": "bin",
+      "role": "other"
+    }
+  ],
+  "exports": {
+    "flipper": "Somfy Telis"
+  },
+  "tests": [
+    {},
+    {}
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "fixed_code",
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [
+      303875000,
+      433920000
+    ]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 350,
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "invert": true,
+    "symbols": {
+      "0": [
+        1,
+        -2
+      ],
+      "1": [
+        2,
+        -1
+      ]
+    },
+    "sync": {
+      "pattern": [
+        -49,
+        2
+      ],
+      "position": "before"
+    }
+  },
+  "fields": [
+    {
+      "name": "code",
+      "start": 0,
+      "len": 24,
+      "format": "uint",
+      "role": "id"
+    }
+  ],
+  "tests": [
+    {}
+  ],
+  "id": "gate-tx",
+  "name": "GateTX 24-bit remote",
+  "description": "Inverted PWM remote with a 24-bit fixed code and no checksum, used by various ceiling fan and gate controllers. Firmware timing is nominally 350/700 us.",
+  "devices": [
+    {
+      "vendor": "various",
+      "model": "GateTX compatible 433 MHz remote"
+    },
+    {
+      "vendor": "Harbor Breeze",
+      "model": "A25-TX015 ceiling fan remote"
+    },
+    {
+      "vendor": "TX028C-S",
+      "model": "ceiling fan remote"
+    }
+  ],
+  "frame": {
+    "length": 24,
+    "repeats_min": 2,
+    "gap_us": 10000
+  },
+  "status": "verified"
+}

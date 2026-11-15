@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "id": "lacrosse-tx141thb2",
+  "name": "LaCrosse TX141TH-Bv2 temperature and humidity sensor",
+  "status": "verified",
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "sensor_data",
+  "description": "A bounded checked-PWM recovery path can extract the 40-bit frame despite intervening noise durations; the reflected LFSR digest (poly 0x31, seed 0xF4) validates the recovered frame. Temperature is encoded as a 12-bit value minus 500, then scaled by 0.1 degC.",
+  "devices": [
+    {
+      "vendor": "LaCrosse",
+      "model": "TX141TH-Bv2"
+    },
+    {
+      "vendor": "TFA",
+      "model": "30.3221.02"
+    }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [
+      433920000
+    ]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 208,
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "symbols": {
+      "0": [
+        1,
+        -2
+      ],
+      "1": [
+        2,
+        -1
+      ]
+    },
+    "sync": {
+      "pattern": [
+        4,
+        -4
+      ],
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 40,
+    "repeats_min": 1
+  },
+  "fields": [
+    {
+      "name": "id",
+      "start": 0,
+      "len": 8,
+      "format": "uint",
+      "role": "id"
+    },
+    {
+      "name": "battery_low",
+      "start": 8,
+      "len": 1,
+      "format": "uint",
+      "role": "battery"
+    },
+    {
+      "name": "test",
+      "start": 9,
+      "len": 1,
+      "format": "uint"
+    },
+    {
+      "name": "channel",
+      "start": 10,
+      "len": 2,
+      "format": "uint",
+      "role": "channel"
+    },
+    {
+      "name": "temperature",
+      "start": 12,
+      "len": 12,
+      "format": "uint",
+      "role": "temperature",
+      "scale": 0.1,
+      "offset": -50,
+      "unit": "degC"
+    },
+    {
+      "name": "humidity",
+      "start": 24,
+      "len": 8,
+      "format": "uint",
+      "role": "humidity",
+      "unit": "%"
+    },
+    {
+      "name": "digest",
+      "start": 32,
+      "len": 8,
+      "format": "hex",
+      "role": "check"
+    }
+  ],
+  "check": {
+    "type": "lfsr_digest8_reflect",
+    "range": [
+      0,
+      32
+    ],
+    "at": 32,
+    "poly": "0x31",
+    "init": "0xF4"
+  },
+  "tests": [
+    {}
+  ]
+}

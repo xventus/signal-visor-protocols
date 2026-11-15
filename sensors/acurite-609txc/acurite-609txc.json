@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "acurite-609txc",
+  "name": "Acurite 609TXC thermometer and hygrometer",
+  "status": "verified",
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "sensor_data",
+  "description": "Acurite 609TXC outdoor sensor for the 00609 and similar displays. Forty bits of PPM, preceded by three short pulses and a nine millisecond gap that act as a sync. The last byte is the sum of the four bytes before it, taken modulo 256 — weaker than a CRC, since it cannot see two errors that cancel, but enough to throw away most misreads. Beware the battery bit: it is set when the battery is LOW, the opposite of the convention some other readers of this sensor use, hence battery_low.",
+  "devices": [
+    { "vendor": "Acurite", "model": "609TXC", "note": "sensor for the 00609 display" },
+    { "vendor": "Acurite", "model": "609A1TX" }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [433920000]
+  },
+  "coding": {
+    "type": "PPM",
+    "te_us": 501,
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "symbols": {
+      "0": [1, -2],
+      "1": [1, -4]
+    },
+    "sync": {
+      "pattern": [1, -1, 1, -1, 1, -18],
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 40,
+    "repeats_min": 2,
+    "gap_us": 10950
+  },
+  "fields": [
+    { "name": "id", "start": 0, "len": 8, "format": "uint", "role": "id" },
+    { "name": "battery_low", "start": 8, "len": 1, "format": "uint", "role": "battery" },
+    { "name": "status", "start": 9, "len": 3, "format": "uint" },
+    { "name": "temperature", "start": 12, "len": 12, "format": "int", "role": "temperature", "scale": 0.1, "unit": "degC" },
+    { "name": "humidity", "start": 24, "len": 8, "format": "uint", "role": "humidity", "unit": "%" },
+    { "name": "checksum", "start": 32, "len": 8, "format": "hex", "role": "check" }
+  ],
+  "check": {
+    "type": "sum8",
+    "range": [0, 32],
+    "at": 32
+  },
+  "tests": [
+    {},
+    {}
+  ]
+}

@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fotoventus.cz/signalvisor/schema/protocol.schema.json",
+  "title": "Signal Visor protocol definition",
+  "description": "Declarative description of a sub-GHz protocol. Data only: no scripts and no expressions, so definitions can be distributed as content rather than code. A frame is a string of symbols; for binary protocols the alphabet is {0,1} and a symbol is a bit, for tri-state chips it is {0,1,F}. Field offsets index symbols.",
+  "type": "object",
+  "required": ["schema", "id", "name", "rf", "coding", "frame"],
+  "additionalProperties": false,
+
+  "properties": {
+    "schema": {
+      "description": "Definition format version. A newer value than the application supports makes it skip the definition and ask the user to update.",
+      "type": "integer",
+      "const": 1
+    },
+    "id": {
+      "description": "Stable slug, unique across the library.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "status": {
+      "description": "'verified' means real captures prove the definition decodes, and the tests that show it run with every build of the application; the evidence itself is kept in the application repository, not in this file. Timing copied from a datasheet stays 'draft' until a real capture proves it.",
+      "enum": ["draft", "verified"],
+      "default": "draft"
+    },
+    "version": { "type": "string" },
+    "description": { "type": "string" },
+    "license": { "type": "string", "default": "CC0-1.0" },
+    "authors": { "type": "array", "items": { "type": "string" } },
+
+    "classification": {
+      "description": "Drives what the application tells the user: a rolling code cannot be interpreted beyond its visible parts.",
+      "enum": ["fixed_code", "rolling_code", "sensor_data"],
+      "default": "fixed_code"
+    },
+
+    "devices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "vendor": { "type": "string" },
+          "model": { "type": "string" },
+          "fcc_id": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "rf": {
+      "type": "object",
+      "required": ["modulation", "frequencies_hz"],
+      "additionalProperties": false,
+      "properties": {
+        "modulation": { "enum": ["OOK", "FSK", "GFSK"] },
+        "frequencies_hz": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "integer", "minimum": 1000000, "maximum": 6000000000 }
+        },
+        "deviation_hz": { "type": "number", "exclusiveMinimum": 0 },
+        "bandwidth_hz": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+
+    "coding": {
+      "type": "object",
+      "required": ["type", "te_us"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "description": "PWM and PPM are described by symbols; MANCHESTER, DMC (Differential Manchester) and NRZ are line codes; PCM is a plain clocked bitstream already handed back by an FSK or PSK symbol decoder, with no mark/space pattern of its own.",
+          "enum": ["PWM", "PPM", "MANCHESTER", "DMC", "NRZ", "PCM"]
+        },
+        "te_us": {
+          "description": "Base timing element in microseconds. For PWM and PPM the symbol patterns are multiples of it; for Manchester it is the half-bit duration. For PCM there is no pulse to measure, so this is documentary only, but still a positive value.",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 100000
+        },
+        "tolerance": {
+          "description": "Accepted relative timing error, 0.3 meaning plus or minus 30 percent.",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1,
+          "default": 0.3
+        },
+        "te_range_us": {
+          "description": "For chips whose clock is set by an external resistor (EV1527, PT2262): the range the timing element takes across devices, [min, max] in microseconds. Within it the element is no evidence for or against the protocol; te_us is then only a typical value and must lie inside the range.",
+          "type": "array",
+          "items": { "type": "number", "exclusiveMinimum": 0 },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "invert": {
+          "description": "True when the chip transmits mark and space inverted.",
+          "type": "boolean",
+          "default": false
+        },
+        "bit_order": { "enum": ["msb", "lsb"], "default": "msb" },
+        "symbols": {
+          "description": "Symbol name to timing pattern in TE units, alternating mark (positive) and space (negative). A pattern may hold several pairs, which is how a tri-state chip encodes one trit.",
+          "type": "object",
+          "minProperties": 2,
+          "propertyNames": { "pattern": "^[0-9A-Za-z]$" },
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 2,
+            "items": { "type": "integer" }
+          }
+        },
+        "sync": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pattern": {
+              "description": "Timing pattern in TE units with alternating signs. Unlike a data symbol it may start with a space, because many protocols separate frames with a long gap and no sync pulse, e.g. [-36]. Used by pulse-based coding types.",
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "integer" }
+            },
+            "bits": {
+              "description": "Fixed 0/1 bit pattern marking the start of a frame inside a PCM bitstream, e.g. a sync word such as \"0010110111010100\". Used only when coding.type is PCM.",
+              "type": "string",
+              "pattern": "^[01]+$"
+            },
+            "position": { "enum": ["before", "after"], "default": "before" }
+          }
+        },
+        "polarity": {
+          "description": "Manchester transition polarity; DMC uses ieee (start transition is 0) or thomas (start transition is 1).",
+          "enum": ["ieee", "thomas"],
+          "default": "ieee"
+        },
+        "preamble_symbols": { "type": "string", "pattern": "^[0-9A-Za-z]*$" }
+      }
+    },
+
+    "frame": {
+      "type": "object",
+      "required": ["length"],
+      "additionalProperties": false,
+      "properties": {
+        "length": {
+          "description": "Number of data symbols in one frame (bits, for a binary alphabet).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "repeats_min": { "type": "integer", "minimum": 1, "default": 1 },
+        "gap_us": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "start", "len"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "start": { "type": "integer", "minimum": 0 },
+          "len": { "type": "integer", "minimum": 1 },
+          "format": {
+            "description": "'raw' is the only format valid for a non-binary alphabet.",
+            "enum": ["hex", "bin", "uint", "int", "bcd", "raw"],
+            "default": "hex"
+          },
+          "role": {
+            "description": "What the field means, so the interface and exports can treat it sensibly.",
+            "enum": ["id", "button", "battery", "channel", "counter", "temperature", "humidity", "check", "other"]
+          },
+          "byte_order": { "enum": ["be", "le"], "default": "be" },
+          "scale": { "type": "number" },
+          "offset": { "type": "number" },
+          "unit": { "type": "string" }
+        }
+      }
+    },
+
+    "check": {
+      "description": "Checksum or CRC over part of the frame. Requires a binary alphabet. Every CRC parameter is open so the solver can search this space.",
+      "type": "object",
+      "required": ["type", "range", "at"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "enum": ["crc8", "crc16", "sum8", "xor8", "lfsr_digest8_reflect", "lfsr_digest16", "none"] },
+        "range": {
+          "description": "Covered symbols as [start, end).",
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "at": {
+          "description": "First symbol of the stored check value.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "len": { "enum": [8, 16] },
+        "poly": { "type": "string", "pattern": "^(0[xX])?[0-9a-fA-F]+$" },
+        "init": { "type": "string", "pattern": "^(0[xX])?[0-9a-fA-F]+$" },
+        "reflect_in": { "type": "boolean", "default": false },
+        "reflect_out": { "type": "boolean", "default": false },
+        "xor_out": { "type": "string", "pattern": "^(0[xX])?[0-9a-fA-F]+$" }
+      }
+    },
+
+    "exports": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "flipper": {
+          "description": "Flipper Zero protocol name, when its firmware knows this protocol.",
+          "type": "string"
+        },
+        "rtl433": { "type": "string" },
+        "esphome": { "enum": ["rc_switch", "raw"] }
+      }
+    },
+
+    "tests": {
+      "description": "One entry per test case proving the definition. A shared definition usually carries only the count (empty objects); which capture and which values each entry stands for is kept in the application repository, matched by position. At least one entry is required before status may become 'verified'.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "description": "Sample capture, when this project owns one: a path relative to the definition file, for a CC0 sample committed next to it. Omitted when the capture this test case was checked against is an outside recording (rtl_433 test suite or Flipper Zero collection) kept out of distributed definitions; that pointer lives in the development test suite instead, matched to this entry by position.",
+            "type": "string",
+            "minLength": 1
+          },
+          "expect": {
+            "description": "Expected field values, keyed by field name.",
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "sample_rate_hz": {
+            "description": "Sample rate of the capture, when the file name does not state it. Older corpus files are named gfile001.cu8 with no parameters at all.",
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "frequency_hz": {
+            "description": "Centre frequency of the capture, when the file name does not state it.",
+            "type": "integer",
+            "minimum": 1000000
+          },
+          "frame_hex": {
+            "description": "Expected whole frame in hexadecimal, in this definition's own bit order.",
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]+$"
+          },
+          "frame_symbols": {
+            "description": "Expected whole frame as symbols, which is the only way to state it for a non-binary alphabet such as the tri-state chips.",
+            "type": "string",
+            "pattern": "^[0-9A-Za-z]+$"
+          },
+          "rtl433_tristate": {
+            "description": "The tri-state string rtl_433 prints for the same capture. It writes Z for the floating state where the PT2262 datasheet, and this library, write F.",
+            "type": "string",
+            "pattern": "^[0-9A-Za-z]+$"
+          },
+          "rtl433_code": {
+            "description": "The value rtl_433 prints for the same capture, kept for traceability. A decoder there may use the opposite bit order, so this is not always equal to frame_hex.",
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]+$"
+          },
+          "rtl433_bit_order": {
+            "description": "How rtl433_code relates to frame_hex: 'same', or 'reversed' when rtl_433 reads the frame from the other end.",
+            "enum": ["same", "reversed"],
+            "default": "same"
+          },
+          "repeats": { "type": "integer", "minimum": 1 },
+          "note": { "type": "string" }
+        }
+      }
+    }
+  },
+
+  "allOf": [
+    {
+      "if": { "properties": { "coding": { "properties": { "type": { "enum": ["PWM", "PPM"] } } } } },
+      "then": { "properties": { "coding": { "required": ["symbols"] } } }
+    },
+    {
+      "if": { "properties": { "coding": { "properties": { "type": { "const": "PCM" } } } } },
+      "then": {
+        "properties": {
+          "coding": {
+            "required": ["sync"],
+            "properties": { "sync": { "required": ["bits"] } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "verified" } }, "required": ["status"] },
+      "then": { "properties": { "tests": { "minItems": 1 } }, "required": ["tests"] }
+    }
+  ]
+}

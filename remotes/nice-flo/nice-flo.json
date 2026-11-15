@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "id": "nice-flo",
+  "name": "Nice FLO fixed-code remote",
+  "status": "draft",
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "fixed_code",
+  "description": "Gate remote with a 12-bit fixed code. Frames are separated by a long gap alone, with no sync pulse in front of the data, which is why the sync pattern here is a single negative value. Both the element length and the frame gap are commonly cited values rather than measured ones. Twelve symbols of plain PWM is a very weak fingerprint; a short frame with no checksum and no verified timing cannot be told apart from noise, which is the reason this stays a draft. This definition describes the 12-bit variant alone — Nice FLO also exists in a 24-bit form.",
+  "devices": [
+    {
+      "vendor": "Nice",
+      "model": "FLO1 / FLO2 / FLO4"
+    }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [
+      433920000
+    ]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 700,
+    "tolerance": 0.35,
+    "bit_order": "msb",
+    "symbols": {
+      "0": [
+        1,
+        -2
+      ],
+      "1": [
+        2,
+        -1
+      ]
+    },
+    "sync": {
+      "pattern": [
+        -36
+      ],
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 12,
+    "repeats_min": 2
+  },
+  "fields": [
+    {
+      "name": "code",
+      "start": 0,
+      "len": 12,
+      "format": "hex",
+      "role": "id"
+    }
+  ],
+  "exports": {
+    "flipper": "Nice FLO"
+  },
+  "tests": []
+}

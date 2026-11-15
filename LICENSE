@@ -1,0 +1,49 @@
+CC0 1.0 Universal — Public Domain Dedication
+
+
+WHAT THIS COVERS
+
+Everything in this repository:
+
+  * protocol definitions (the *.json files)
+  * sample captures committed alongside them (*.sub, *.cu8 and any other recording)
+  * the documentation in this repository
+
+It does NOT cover the Signal Visor application itself, which is closed source and distributed
+separately, and it does NOT cover outside recording collections (the rtl_433 test suite, the
+Flipper Zero collection), which the application's tests refer to but which are never copied into
+this repository.
+
+
+THE DEDICATION
+
+To the extent possible under law, the contributors have waived all copyright and related or
+neighbouring rights to the material described above. The work is dedicated to the public domain
+worldwide.
+
+You may copy, modify, distribute and use the material, including for commercial purposes, all
+without asking permission and without attribution of any kind.
+
+The full legal text is at: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+
+WHY
+
+The point of a protocol library is that it spreads. A definition is mostly a set of facts about
+somebody else's device — a timing, a bit layout, a polynomial — and locking facts away helps no
+one. Putting them in the public domain lets rtl_433, ESPHome, Flipper firmware and anyone else
+take them directly, which is good for everybody who owns the devices they describe.
+
+Sample captures are under the same dedication, deliberately. A recording is more of a work than
+a timing table is, so without a licence nobody may redistribute it, and a test suite that cannot
+be redistributed is of no use to anyone else. The external rtl_433 corpus shows the problem: it
+is excellent material that declares no licence, so this project can reference it but never ship
+it.
+
+
+CONTRIBUTING
+
+By contributing a definition or a capture you place it under this same dedication. Please only
+contribute recordings of your own devices.
+
+No warranty is given. A definition may be wrong, and a device of the same model may differ.

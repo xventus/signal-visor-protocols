@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "came-18",
+  "name": "CAME 18-bit remote",
+  "status": "verified",
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "fixed_code",
+  "description": "The eighteen bit form of the CAME encoding, used by appliance remotes as well as gates. Everything but the frame length matches the twelve bit form: a bit is a gap followed by a pulse of constant total length, a short gap with a long pulse being a zero and a long gap with a short pulse a one, and the definition describes the inverted stream because this schema wants data symbols to begin with a pulse. It is a separate definition because the schema fixes the frame length; the frame length is also the only thing that separates the two, which is why both are offered as candidates and the ranking leans on how much of the burst each one explains.",
+  "devices": [
+    { "vendor": "Elica", "model": "cooker hood remote", "note": "fan and light buttons, 433.92 MHz" },
+    { "vendor": "CAME", "model": "18-bit remotes and clones" }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [433920000, 868350000]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 320,
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "invert": true,
+    "symbols": {
+      "0": [1, -2],
+      "1": [2, -1]
+    },
+    "sync": {
+      "pattern": [36, -1],
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 18,
+    "repeats_min": 1,
+    "gap_us": 9000
+  },
+  "fields": [
+    { "name": "code", "start": 0, "len": 18, "format": "uint", "role": "id" }
+  ],
+  "tests": [
+    {},
+    {}
+  ]
+}

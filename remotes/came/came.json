@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "id": "came",
+  "name": "CAME 12-bit gate remote",
+  "status": "draft",
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "fixed_code",
+  "description": "CAME gate and garage remotes in their twelve bit form, and the many clones that copy them. The bit is carried by a gap followed by a pulse of constant total length: a short gap with a long pulse is a one, a long gap with a short pulse is a zero. That is the wrong way round for this schema, whose data symbols must begin with a pulse, so the definition sets \"invert\" — the flag that exists for exactly these chips — and describes the inverted stream, where the frame separator becomes a long pulse and each bit becomes pulse-then-gap. Reading it the other way, as pulse-then-gap on the raw stream, decodes a frame of all ones correctly and then falls apart on the first zero — a reminder that an internally consistent decode is not the same as a correct one. The structure matches Nice FLO: a long separator and 1:2 pulse width modulation, differing only in the timing element, which is why both are drafts and identification leans on the measured element rather than the nominal one.",
+  "devices": [
+    {
+      "vendor": "CAME",
+      "model": "TOP 432EE and relatives",
+      "note": "12-bit fixed code"
+    },
+    {
+      "vendor": "various",
+      "model": "CAME-compatible gate remote"
+    },
+    {
+      "vendor": "various",
+      "model": "W727 doorbell",
+      "note": "decodes as CAME at 333 us; attribution is ours, not confirmed"
+    }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [
+      433920000,
+      868350000
+    ]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 320,
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "invert": true,
+    "symbols": {
+      "0": [
+        1,
+        -2
+      ],
+      "1": [
+        2,
+        -1
+      ]
+    },
+    "sync": {
+      "pattern": [
+        36,
+        -1
+      ],
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 12,
+    "repeats_min": 2,
+    "gap_us": 9000
+  },
+  "fields": [
+    {
+      "name": "code",
+      "start": 0,
+      "len": 12,
+      "format": "uint",
+      "role": "id"
+    }
+  ],
+  "tests": [
+    {}
+  ]
+}

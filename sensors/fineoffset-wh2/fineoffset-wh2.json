@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "fineoffset-wh2",
+  "name": "Fine Offset WH2 thermometer and hygrometer",
+  "status": "verified",
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "sensor_data",
+  "description": "Fine Offset Electronics WH2, sold as Agimex Rosenborg 66796 in Denmark and ClimeMET CM9088 in the UK. Unlike most cheap sensors this one is checksummed: the last byte is a CRC-8 over the four payload bytes, polynomial 0x31 with a zero start value, which makes a misread frame detectable rather than merely improbable. The gap between pulses is constant and the pulse length carries the data, so this is PWM, and note that it is the SHORT pulse that means one. The frame opens with eight one bits, which is the preamble a receiver locks onto; it is kept as part of the frame here because exactly one frame fits in a burst.",
+  "devices": [
+    { "vendor": "Fine Offset Electronics", "model": "WH2" },
+    { "vendor": "Agimex", "model": "Rosenborg 66796" },
+    { "vendor": "ClimeMET", "model": "CM9088" }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [433920000]
+  },
+  "coding": {
+    "type": "PWM",
+    "te_us": 492,
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "symbols": {
+      "1": [1, -2],
+      "0": [3, -2]
+    }
+  },
+  "frame": {
+    "length": 48,
+    "repeats_min": 1,
+    "gap_us": 50000
+  },
+  "fields": [
+    { "name": "preamble", "start": 0, "len": 8, "format": "bin" },
+    { "name": "type", "start": 8, "len": 4, "format": "hex" },
+    { "name": "id", "start": 12, "len": 8, "format": "uint", "role": "id" },
+    { "name": "temperature", "start": 20, "len": 12, "format": "int", "role": "temperature", "scale": 0.1, "unit": "degC" },
+    { "name": "humidity", "start": 32, "len": 8, "format": "uint", "role": "humidity", "unit": "%" },
+    { "name": "crc", "start": 40, "len": 8, "format": "hex", "role": "check" }
+  ],
+  "check": {
+    "type": "crc8",
+    "range": [8, 40],
+    "at": 40,
+    "poly": "0x31",
+    "init": "0x00"
+  },
+  "tests": [
+    {},
+    {}
+  ]
+}

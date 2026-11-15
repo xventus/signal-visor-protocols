@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "nexus-th",
+  "name": "Nexus-TH thermometer and hygrometer",
+  "status": "verified",
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "sensor_data",
+  "description": "A very common cheap outdoor temperature and humidity sensor, sold under many names (Nexus, FreeTec NC-7345, Clas Ohlson TW003/TW007, Digoo and others). The transmitter sends 36 bits twelve times in a row, separated by a long gap. The pulse is always the same length and the gap carries the data, so this is PPM: a short gap is a zero and a double-length gap is a one. There is no checksum at all; the only integrity check available is the constant nibble 0xF before the humidity and the fact that the frame is repeated a dozen times, which is why the decoder insists on seeing the same frame twice.",
+  "devices": [
+    { "vendor": "Clas Ohlson", "model": "TW003 / TW007 (part 36-441)" },
+    { "vendor": "FreeTec", "model": "NC-7345 for weather station NC-7344" },
+    { "vendor": "various", "model": "Nexus / Digoo / Sencor thermo-hygrometer" }
+  ],
+  "rf": {
+    "modulation": "OOK",
+    "frequencies_hz": [433920000]
+  },
+  "coding": {
+    "type": "PPM",
+    "te_us": 489,
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "symbols": {
+      "0": [1, -2],
+      "1": [1, -4]
+    },
+    "sync": {
+      "pattern": [1, -8],
+      "position": "after"
+    }
+  },
+  "frame": {
+    "length": 36,
+    "repeats_min": 2,
+    "gap_us": 3910
+  },
+  "fields": [
+    { "name": "id", "start": 0, "len": 8, "format": "uint", "role": "id" },
+    { "name": "battery_ok", "start": 8, "len": 1, "format": "uint", "role": "battery" },
+    { "name": "reserved", "start": 9, "len": 1, "format": "bin" },
+    { "name": "channel", "start": 10, "len": 2, "format": "uint", "role": "channel", "offset": 1 },
+    { "name": "temperature", "start": 12, "len": 12, "format": "int", "role": "temperature", "scale": 0.1, "unit": "degC" },
+    { "name": "constant", "start": 24, "len": 4, "format": "bin" },
+    { "name": "humidity", "start": 28, "len": 8, "format": "uint", "role": "humidity", "unit": "%" }
+  ],
+  "tests": [
+    {}
+  ]
+}

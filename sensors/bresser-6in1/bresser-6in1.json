@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "bresser-6in1",
+  "name": "Bresser 6-in-1 weather sensor",
+  "status": "verified",
+  "version": "1.0.0",
+  "license": "CC0-1.0",
+  "classification": "sensor_data",
+  "description": "Bresser 6-in-1 outdoor weather sensor on 868.3 MHz, FSK with a plain clocked bitstream (PCM): there is no mark/space pattern to measure, so framing is anchored to the 16-bit sync word 0x2dd4 that follows the longer alternating preamble. A 16-bit LFSR digest over the id, sensor_type, channel and the undeclared payload bytes protects the frame. FIELDS CANNOT BE DECLARED YET for temperature, humidity, wind and rain: those bytes pack two BCD digits across byte boundaries and the wind bytes are conditionally byte-inverted depending on which of two mutually exclusive frame layouts (wind/UV or rain) is present, neither of which this schema's flat bit-offset fields can express.",
+  "devices": [
+    { "vendor": "Bresser", "model": "6-in-1 weather station sensor" }
+  ],
+  "rf": {
+    "modulation": "FSK",
+    "frequencies_hz": [868300000],
+    "deviation_hz": 25000
+  },
+  "coding": {
+    "type": "PCM",
+    "te_us": 124,
+    "tolerance": 0.3,
+    "bit_order": "msb",
+    "sync": {
+      "bits": "0010110111010100",
+      "position": "before"
+    }
+  },
+  "frame": {
+    "length": 144,
+    "repeats_min": 1
+  },
+  "fields": [
+    { "name": "digest", "start": 0, "len": 16, "format": "hex", "role": "check" },
+    { "name": "id", "start": 16, "len": 32, "format": "uint", "role": "id" },
+    { "name": "sensor_type", "start": 48, "len": 4, "format": "uint" },
+    { "name": "startup", "start": 52, "len": 1, "format": "uint" },
+    { "name": "channel", "start": 53, "len": 3, "format": "uint", "role": "channel" },
+    { "name": "checksum", "start": 136, "len": 8, "format": "hex", "role": "check" }
+  ],
+  "check": {
+    "type": "lfsr_digest16",
+    "range": [16, 136],
+    "at": 0,
+    "len": 16,
+    "poly": "0x8810",
+    "init": "0x5412"
+  },
+  "exports": {
+    "rtl433": "Bresser-6in1"
+  },
+  "tests": [
+    {},
+    {},
+    {}
+  ]
+}
